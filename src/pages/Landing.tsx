@@ -1,13 +1,11 @@
-import { ArrowRight, Brain, Code2,SquareFunctionIcon,SquareTerminal,SquareTerminalIcon, Globe, Timer, Trophy } from "lucide-react";
-import { FaGithub, FaLinkedin, FaTwitter } from "react-icons/fa";
+import { ArrowRight, Brain, Globe, Timer, Trophy } from "lucide-react";
+import { FaGithub } from "react-icons/fa";
 import { FeatureCard } from "../components/Feature.tsx";
-import { MdEmail } from "react-icons/md";
+// @ts-ignore
 import '@fontsource-variable/jetbrains-mono';
-// Supports weights 100-900
+// @ts-ignore
 import '@fontsource-variable/inter';
-// Supports weights 300-700
-import '@fontsource-variable/fira-code';
-import {Link, useNavigate} from "react-router-dom";
+import { useNavigate} from "react-router-dom";
 
 export const LandingPage = () => {
   const navigate = useNavigate();

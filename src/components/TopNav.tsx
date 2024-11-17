@@ -1,5 +1,6 @@
 import { SquareTerminalIcon} from "lucide-react";
 import {Link} from "react-router-dom";
+import {Button} from "@/components/ui/button.tsx";
 
 export const TopNavBar = () => {
     return <div className="bg-gray-900 text-white border-b border-gray-800 shadow-md">
@@ -16,12 +17,12 @@ export const TopNavBar = () => {
                 >
                     How It Works
                 </Link>
-                <button
+                <Button
                     type="button"
                     className="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-md transition-colors"
                 >
                     Get Started
-                </button>
+                </Button>
             </div>
         </nav>
 
