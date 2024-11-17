@@ -1,7 +1,7 @@
-import {Code2} from "lucide-react";
 import {FaGithub, FaLinkedin, FaTwitter} from "react-icons/fa";
 import {MdEmail} from "react-icons/md";
 import {Link} from "react-router-dom";
+import {Code} from "lucide-react";
 
 export const Footer = () => {
     return <footer className="bg-black border-t border-gray-800 text-white">
@@ -9,7 +9,7 @@ export const Footer = () => {
             <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
                 <div className="space-y-4">
                     <div className="flex items-center space-x-2">
-                        <Code2 className="w-6 h-6 text-blue-500"/>
+                        <Code className="w-6 h-6 text-blue-500"/>
                         <span className="text-lg font-bold">Cod3Kombat</span>
                     </div>
                     <p className="text-gray-400 text-sm">
