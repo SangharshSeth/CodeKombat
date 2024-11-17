@@ -10,7 +10,7 @@ export const Footer = () => {
                 <div className="space-y-4">
                     <div className="flex items-center space-x-2">
                         <Code2 className="w-6 h-6 text-blue-500"/>
-                        <span className="text-lg font-bold">CodeDuel</span>
+                        <span className="text-lg font-bold">Cod3Kombat</span>
                     </div>
                     <p className="text-gray-400 text-sm">
                         Challenge yourself and others in real-time coding battles.
@@ -107,7 +107,7 @@ export const Footer = () => {
         <div className="border-t border-gray-800">
             <div className="container mx-auto px-6 py-8">
                 <p className="text-center text-gray-400 text-sm">
-                    © 2024 CodeDuel. All rights reserved.
+                    © 2024 CodeKombat. All rights reserved.
                 </p>
             </div>
         </div>

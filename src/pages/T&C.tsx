@@ -12,7 +12,7 @@ export const TermsAndConditions = () => {
                     <section>
                         <h2 className="text-2xl font-semibold mb-4">1. Introduction</h2>
                         <p>
-                            Welcome to CodeDuel! These terms and conditions outline the rules
+                            Welcome to CodeKombat! These terms and conditions outline the rules
                             and regulations for using our platform. By accessing or using our
                             services, you agree to be bound by these terms. If you do not
                             agree with any part of the terms, you may not use the platform.
@@ -22,7 +22,7 @@ export const TermsAndConditions = () => {
                     <section>
                         <h2 className="text-2xl font-semibold mb-4">2. User Obligations</h2>
                         <p>
-                            As a user of CodeDuel, you agree to:
+                            As a user of CodeKombat, you agree to:
                         </p>
                         <ul className="list-disc pl-6 space-y-2">
                             <li>
@@ -46,7 +46,7 @@ export const TermsAndConditions = () => {
                         </p>
                         <ul className="list-disc pl-6 space-y-2">
                             <li>
-                                Violate the intellectual property rights of CodeDuel or other
+                                Violate the intellectual property rights of CodeKombat or other
                                 users.
                             </li>
                             <li>Involve hacking, data theft, or unauthorized access.</li>
@@ -60,7 +60,7 @@ export const TermsAndConditions = () => {
                     <section>
                         <h2 className="text-2xl font-semibold mb-4">4. Limitation of Liability</h2>
                         <p>
-                            CodeDuel is not responsible for any loss or damage arising from
+                            CodeKombat is not responsible for any loss or damage arising from
                             the use of our platform. All challenges, results, and rankings are
                             offered "as is" without warranties of any kind.
                         </p>
@@ -69,7 +69,7 @@ export const TermsAndConditions = () => {
                     <section>
                         <h2 className="text-2xl font-semibold mb-4">5. Changes to Terms</h2>
                         <p>
-                            CodeDuel reserves the right to update or modify these terms at any
+                            CodeKombat reserves the right to update or modify these terms at any
                             time. Any changes will be posted on this page with the "Last
                             Updated" date.
                         </p>
@@ -81,10 +81,10 @@ export const TermsAndConditions = () => {
                             For any questions or concerns regarding these terms, feel free to
                             contact us at{" "}
                             <a
-                                href="mailto:support@codeduel.com"
+                                href="mailto:support@CodeKombat.com"
                                 className="text-blue-400 hover:underline"
                             >
-                                support@codeduel.com
+                                support@CodeKombat.com
                             </a>
                             .
                         </p>

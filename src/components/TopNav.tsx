@@ -8,7 +8,7 @@ export const TopNavBar = () => {
             className="container mx-auto px-6 py-4 flex justify-between items-center  text-white">
             <div className="flex items-center space-x-2">
                 <SquareTerminalIcon className="w-8 h-8 text-blue-400"/>
-                <Link to='/'><span className="text-xl font-bold" style={{fontFamily: "JetBrains Mono Variable"}}>Printf();</span></Link>
+                <Link to='/'><span className="text-xl font-bold" style={{fontFamily: "SF Mono"}}>C0d3Kombat</span></Link>
             </div>
             <div className="flex items-center space-x-6">
                 <Link
