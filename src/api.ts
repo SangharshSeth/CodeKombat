@@ -1,0 +1,1 @@
+export const PISTON_CODE_EXECUTOR = "https://emkc.org/api/v2/piston/execute"

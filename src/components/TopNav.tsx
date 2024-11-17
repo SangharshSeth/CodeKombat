@@ -1,4 +1,4 @@
-import {Code2, SquareTerminalIcon} from "lucide-react";
+import { SquareTerminalIcon} from "lucide-react";
 import {Link} from "react-router-dom";
 
 export const TopNavBar = () => {
@@ -7,11 +7,11 @@ export const TopNavBar = () => {
             className="container mx-auto px-6 py-4 flex justify-between items-center  text-white">
             <div className="flex items-center space-x-2">
                 <SquareTerminalIcon className="w-8 h-8 text-blue-400"/>
-                <Link to='/'><span className="text-xl font-bold">CodeDuel</span></Link>
+                <Link to='/'><span className="text-xl font-bold" style={{fontFamily: "JetBrains Mono Variable"}}>Printf();</span></Link>
             </div>
             <div className="flex items-center space-x-6">
                 <Link
-                    href="#howItWorks"
+                    to="#"
                     className="hover:text-blue-400 transition-colors"
                 >
                     How It Works
