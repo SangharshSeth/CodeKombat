@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { CheckCircle, User, Code2 } from "lucide-react";
+import {useNavigate} from "react-router-dom";
 
 interface MatchFoundScreenProps {
   matchData: any;
@@ -7,6 +8,12 @@ interface MatchFoundScreenProps {
 }
 
 const MatchFoundScreen = ({ matchData, onCancel }: MatchFoundScreenProps) => {
+  const navigate = useNavigate();
+  const handleClick = () => {
+    navigate("/start-match", {
+      state: { matchData },
+    })
+  }
   return (
     <motion.div
       key="match-found"
@@ -75,6 +82,7 @@ const MatchFoundScreen = ({ matchData, onCancel }: MatchFoundScreenProps) => {
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
+            onClick={handleClick}
             className="px-6 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors"
           >
             Start Match
