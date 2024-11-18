@@ -7,7 +7,7 @@ import {useLocation} from "react-router-dom";
 import {FaClock} from 'react-icons/fa'
 import {Languages} from "@/constants.ts";
 import {PISTON_CODE_EXECUTOR} from "@/api.ts";
-import { useToast} from "@/hooks/use-toast.ts";
+import {useToast} from "@/hooks/use-toast.ts";
 import {Toaster} from "@/components/ui/toaster.tsx";
 
 export const CodingEnvironment = () => {
@@ -15,69 +15,68 @@ export const CodingEnvironment = () => {
     const [language, setLanguage] = useState("python");
     const [output, setOutput] = useState("");
     const [isExecuting, setIsExecuting] = useState(false);
-    const [timer, setTimer] = useState(0)
-    const [timeLeft, setTimeLeft] = useState(0)
-    const [editorTheme, setEditorTheme] = useState("vs-dark")
-    const  { toast } = useToast()
+    const [timeLeft, setTimeLeft] = useState(() => {
+        const saved = localStorage.getItem('timeLeft');
+        return saved ? parseInt(saved, 10) : 0;
+    });
+    const [editorTheme, setEditorTheme] = useState("vs-dark");
+    const {toast} = useToast();
 
     const location = useLocation();
     const data = location.state || {};
-    console.log("Coding Environment Data", data.matchData);
 
+    // Initialize timer based on difficulty
     useEffect(() => {
-        console.log(data.matchData.question.difficulty)
-        // Ensure matchData and difficulty exist
-        const savedTimer = localStorage.getItem('timer');
-        const savedTimeLeft = localStorage.getItem('timeLeft');
-        if (savedTimer && savedTimeLeft) {
-            setTimer(parseInt(savedTimer, 10));
-            setTimeLeft(parseInt(savedTimeLeft, 10));
-        } else if (data.matchData.question.difficulty) {
-            let timerValue = 0;
-            switch (data.matchData.question.difficulty) {
-                case "Easy":
-                    timerValue = 30;
-                    break;
-                case "Medium":
-                    timerValue = 60;
-                    break;
-                case "Hard":
-                    timerValue = 90;
-                    break;
-                default:
-                    console.error("Unknown difficulty");
-            }
-            setTimer(timerValue);
-            localStorage.setItem("timer", JSON.stringify(timerValue));
-            setTimeLeft(timer * 60)
+        const difficulty = data.matchData?.question?.difficulty;
+        if (!difficulty) return;
+
+        let timerValue = 0;
+        switch (difficulty) {
+            case "Easy":
+                timerValue = 30 * 60; // Convert to seconds directly
+                break;
+            case "Medium":
+                timerValue = 60 * 60;
+                break;
+            case "Hard":
+                timerValue = 90 * 60;
+                break;
+            default:
+                console.error("Unknown difficulty");
+                return;
         }
-    }, [data.matchData.question?.difficulty]);
 
+        // Only set new timer if there's no existing timer
+        if (!localStorage.getItem('timeLeft')) {
+            setTimeLeft(timerValue);
+            localStorage.setItem('timeLeft', timerValue.toString());
+        }
+    }, [data.matchData?.question?.difficulty]);
 
-    const formatTime = useCallback(() => {
-        const minutes = Math.floor(timeLeft / 60);
-        const seconds = timeLeft % 60;
-
-        return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-    }, [timeLeft])
-
-
+    // Timer countdown effect
     useEffect(() => {
         if (timeLeft <= 0) return;
 
         const timerInterval = setInterval(() => {
-            setTimeLeft((prevState) => {
-                if (prevState <= 0) {
+            setTimeLeft(prevTime => {
+                const newTime = prevTime - 1;
+                if (newTime <= 0) {
                     clearInterval(timerInterval);
+                    localStorage.removeItem('timeLeft');
                     return 0;
                 }
-                localStorage.setItem('timeLeft', JSON.stringify(prevState));
-                return prevState - 1;
+                localStorage.setItem('timeLeft', newTime.toString());
+                return newTime;
             });
-        }, 1000)
-        return () => {
-            clearInterval(timerInterval)
-        }
+        }, 1000);
+
+        return () => clearInterval(timerInterval);
+    }, [timeLeft]);
+
+    const formatTime = useCallback(() => {
+        const minutes = Math.floor(timeLeft / 60);
+        const seconds = timeLeft % 60;
+        return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
     }, [timeLeft]);
 
     const executeCode = async () => {
