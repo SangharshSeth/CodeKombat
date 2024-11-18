@@ -51,7 +51,7 @@ export const CodingEnvironment = () => {
             localStorage.setItem("timer", JSON.stringify(timerValue));
             setTimeLeft(timer * 60)
         }
-    }, [data.matchData.questions?.difficulty]);
+    }, [data.matchData.question?.difficulty]);
 
 
     const formatTime = useCallback(() => {
