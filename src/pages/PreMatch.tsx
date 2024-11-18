@@ -129,6 +129,27 @@ const difficulties = [
   { name: "Hard", color: "bg-red-500 text-white" },
 ];
 
+interface IGameData {
+  player1: string
+  player2: string
+  questions: string[]
+}
+
+export interface IMatchDataFromServer {
+  gameRoomId: string
+  gameData: IGameData
+  players: string[]
+}
+
+export interface IMatchData {
+  opponentName: string
+  programmingLanguage: string
+  difficulty: string
+  category: string
+  questions: string[]
+  totalPlayers: string[]
+}
+
 export default function MatchSetupStepper() {
   const [currentStep, setCurrentStep] = useState(0);
   const [username, setUsername] = useState("");
@@ -137,7 +158,7 @@ export default function MatchSetupStepper() {
   const [selectedDifficulty, setSelectedDifficulty] = useState("");
   const [isSearching, setIsSearching] = useState(false);
   const [matchFound, setMatchFound] = useState(false);
-  const [matchData, setMatchData] = useState({});
+  const [matchData, setMatchData] = useState<IMatchData | undefined>();
   const { toast } = useToast();
 
   const handleNext = () => {
@@ -175,6 +196,7 @@ export default function MatchSetupStepper() {
         reconnection: true,
         reconnectionDelay: 1000,
       });
+
       const gameDataToSocket = {
         language: selectedLanguage,
         category: selectedCategory,
@@ -184,23 +206,27 @@ export default function MatchSetupStepper() {
 
       socket.emit("join-matchmaking", gameDataToSocket);
 
-      socket.on("match-found", (data: any) => {
+      socket.on("match-found", (data: IMatchDataFromServer) => {
+        console.log("MATCH DATA SOCK", data)
         setIsSearching(false);
         setMatchFound(true);
         const opponent =
           data.gameData.player1 === username
             ? data.gameData.player2
             : data.gameData.player1;
+        console.log("DATA FROM SERVER", data)
         setMatchData({
           opponentName: opponent,
           programmingLanguage: selectedLanguage,
           difficulty: selectedDifficulty,
           category: selectedCategory,
+          questions: data.gameData.questions,
+          totalPlayers: data.players
         });
         toast({
           title: "Opponent Found",
           description: opponent,
-          duration: 5000,
+          duration: 2000,
           variant: "default",
         });
       });

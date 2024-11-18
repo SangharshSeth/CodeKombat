@@ -2,9 +2,10 @@ import { motion } from "framer-motion";
 import { CheckCircle, User, Code2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import  { useState, useEffect } from "react";
+import {IMatchData} from "@/pages/PreMatch.tsx";
 
 interface MatchFoundScreenProps {
-  matchData: any;
+  matchData: IMatchData | undefined;
   onCancel: () => void;
 }
 
@@ -60,7 +61,7 @@ const MatchFoundScreen = ({ matchData, onCancel }: MatchFoundScreenProps) => {
                 <User className="w-8 h-8 text-blue-500" />
                 <span className="font-medium">Opponent:</span>
               </div>
-              <span className="text-lg text-gray-200">{matchData.opponentName || "Unknown"}</span>
+              <span className="text-lg text-gray-200">{matchData?.opponentName || "Unknown"}</span>
             </div>
 
             <div className="flex items-center justify-between bg-gray-700/50 rounded-lg p-4">
@@ -68,7 +69,7 @@ const MatchFoundScreen = ({ matchData, onCancel }: MatchFoundScreenProps) => {
                 <Code2 className="w-8 h-8 text-purple-500" />
                 <span className="font-medium">Language:</span>
               </div>
-              <span className="text-lg text-gray-200">{matchData.programmingLanguage}</span>
+              <span className="text-lg text-gray-200">{matchData?.programmingLanguage}</span>
             </div>
 
             <div className="flex items-center justify-between bg-gray-700/50 rounded-lg p-4">
@@ -76,7 +77,7 @@ const MatchFoundScreen = ({ matchData, onCancel }: MatchFoundScreenProps) => {
                 <span className="text-xl font-semibold text-yellow-400">⚡</span>
                 <span className="font-medium">Category:</span>
               </div>
-              <span className="text-lg text-gray-200">{matchData.category}</span>
+              <span className="text-lg text-gray-200">{matchData?.category}</span>
             </div>
 
             <div className="flex items-center justify-between bg-gray-700/50 rounded-lg p-4">
@@ -84,7 +85,7 @@ const MatchFoundScreen = ({ matchData, onCancel }: MatchFoundScreenProps) => {
                 <span className="text-xl font-semibold text-red-400">🔥</span>
                 <span className="font-medium">Difficulty:</span>
               </div>
-              <span className="text-lg text-gray-200">{matchData.difficulty}</span>
+              <span className="text-lg text-gray-200">{matchData?.difficulty}</span>
             </div>
           </div>
 
