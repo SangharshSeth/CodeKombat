@@ -27,6 +27,7 @@ const MatchFoundScreen = ({ matchData, onCancel }: MatchFoundScreenProps) => {
   }, [timer]);
 
   const handleStartMatch = () => {
+    console.log("Match Found Data", matchData);
     navigate("/app/start-match", {
       state: { matchData },
     });

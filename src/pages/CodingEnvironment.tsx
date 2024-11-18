@@ -7,6 +7,8 @@ import {useLocation} from "react-router-dom";
 import {FaClock} from 'react-icons/fa'
 import {Languages} from "@/constants.ts";
 import {PISTON_CODE_EXECUTOR} from "@/api.ts";
+import { useToast} from "@/hooks/use-toast.ts";
+import {Toaster} from "@/components/ui/toaster.tsx";
 
 export const CodingEnvironment = () => {
     const [code, setCode] = useState("");
@@ -16,21 +18,23 @@ export const CodingEnvironment = () => {
     const [timer, setTimer] = useState(0)
     const [timeLeft, setTimeLeft] = useState(0)
     const [editorTheme, setEditorTheme] = useState("vs-dark")
+    const  { toast } = useToast()
 
     const location = useLocation();
     const data = location.state || {};
-    console.log("MATCH DATA", data);
+    console.log("Coding Environment Data", data.matchData);
 
     useEffect(() => {
+        console.log(data.matchData.question.difficulty)
         // Ensure matchData and difficulty exist
         const savedTimer = localStorage.getItem('timer');
         const savedTimeLeft = localStorage.getItem('timeLeft');
         if (savedTimer && savedTimeLeft) {
             setTimer(parseInt(savedTimer, 10));
             setTimeLeft(parseInt(savedTimeLeft, 10));
-        } else if (data.matchData?.difficulty) {
+        } else if (data.matchData.question.difficulty) {
             let timerValue = 0;
-            switch (data.matchData.difficulty) {
+            switch (data.matchData.question.difficulty) {
                 case "Easy":
                     timerValue = 30;
                     break;
@@ -47,7 +51,7 @@ export const CodingEnvironment = () => {
             localStorage.setItem("timer", JSON.stringify(timerValue));
             setTimeLeft(timer * 60)
         }
-    }, [data.matchData?.difficulty]);
+    }, [data.matchData.questions?.difficulty]);
 
 
     const formatTime = useCallback(() => {
@@ -99,6 +103,11 @@ export const CodingEnvironment = () => {
 
             const data = await response.json();
             setOutput(data.run?.output || data.message || 'No output');
+            toast({
+                title: "Success",
+                description: data.run?.output || data.message,
+                duration: 5000
+            })
         } catch (error) {
             setOutput(`Error: ${error}`);
         } finally {
@@ -108,6 +117,7 @@ export const CodingEnvironment = () => {
 
     return (
         <div className="min-h-screen bg-gray-950 p-8">
+            <Toaster />
             <div className="max-w-[90%] mx-auto">
                 <div className="w-3/4">
                     <div className="bg-gray-900 rounded-xl overflow-hidden shadow-2xl border border-gray-800">
@@ -175,7 +185,7 @@ export const CodingEnvironment = () => {
                                 theme="vs-dark"
                                 language={language}
                                 value={code}
-                                defaultValue={'printf("Hello World")'}
+                                defaultValue={`/*\n${data.matchData.question.description}\n*/`}
                                 onChange={(value) => setCode(value || "")}
                                 options={{
                                     fontSize: 16,
