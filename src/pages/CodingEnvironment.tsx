@@ -1,14 +1,79 @@
-import {Editor} from '@monaco-editor/react';
-import {useCallback, useEffect, useState} from "react";
-import {Button} from "@/components/ui/button";
-import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
-import {Loader2, Moon, Sun} from 'lucide-react';
-import {useLocation} from "react-router-dom";
-import {FaClock} from 'react-icons/fa'
-import {Languages} from "@/constants.ts";
-import {PISTON_CODE_EXECUTOR} from "@/api.ts";
-import {useToast} from "@/hooks/use-toast.ts";
-import {Toaster} from "@/components/ui/toaster.tsx";
+import { Editor } from "@monaco-editor/react";
+import React, { useEffect, useMemo, useState } from "react";
+import { Button } from "@/components/ui/button";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
+import {
+    Code2,
+    Eye,
+    KeyboardOff,
+    Loader2,
+    Moon,
+    Sun,
+    Terminal,
+} from "lucide-react";
+import { useLocation } from "react-router-dom";
+import { FaClock } from "react-icons/fa";
+import { Languages } from "@/constants.ts";
+import { PISTON_CODE_EXECUTOR } from "@/api.ts";
+import { Toaster } from "@/components/ui/toaster.tsx";
+import { AnimatePresence, motion } from "framer-motion";
+// @ts-expect-error: Some-Error-Idontknow
+import "@fontsource-variable/jetbrains-mono";
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from "@/components/ui/tooltip.tsx";
+import { cn } from "@/lib/utils.ts";
+import { Socket } from "socket.io-client";
+import useStore from "@/websocketStore.ts";
+import { DefaultValues } from "@/comments.ts";
+
+interface CodeExecutionResult {
+    run: {
+        code: number;
+        output?: string;
+    };
+    message?: string;
+}
+interface PowerUp {
+    id: number;
+    icon: React.ReactNode;
+    label: string;
+    color: string;
+}
+
+const powerups: PowerUp[] = [
+    {
+        icon: <Code2 className="w-6 h-6" />,
+        label: "Disable code compilation for 2 minutes",
+        id: 1,
+        color: "text-yellow-400",
+    },
+    {
+        icon: <Eye className="w-6 h-6" />,
+        label: "See opponent's code for 15 seconds",
+        id: 2,
+        color: "text-blue-400",
+    },
+    {
+        icon: <KeyboardOff className="w-6 h-6" />,
+        label: "Disable opponent's keyboard for 1 minute",
+        id: 3,
+        color: "text-red-400",
+    },
+];
+
+export interface PowerUpsProps {
+    webSocket: Socket;
+}
 
 export const CodingEnvironment = () => {
     const [code, setCode] = useState("");
@@ -16,24 +81,52 @@ export const CodingEnvironment = () => {
     const [output, setOutput] = useState("");
     const [isExecuting, setIsExecuting] = useState(false);
     const [timeLeft, setTimeLeft] = useState(() => {
-        const saved = localStorage.getItem('timeLeft');
+        const saved = sessionStorage.getItem("timeLeft");
         return saved ? parseInt(saved, 10) : 0;
     });
     const [editorTheme, setEditorTheme] = useState("vs-dark");
-    const {toast} = useToast();
 
     const location = useLocation();
     const data = location.state || {};
+    const [codeError, setCodeError] = useState(false);
+    const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+    const socket = useStore((state) => state.webSocket);
+    const [powerDownActive, setPowerDownActive] = useState(false);
+    const [disableCodeCompilation, setDisableCodeCompilation] = useState(false);
+    const [defaultCode, setDefaultCode] = useState(() =>
+        DefaultValues("python", data?.matchData?.question?.description)
+    );
 
-    // Initialize timer based on difficulty
+    function executePowerDown(id: number) {
+        if (id === 1) {
+            setDisableCodeCompilation(true);
+            setTimeout(() => {
+                setDisableCodeCompilation(false);
+            }, 120000);
+        }
+        return;
+    }
+
+    useEffect(() => {
+        socket?.on("power-level-down", (data) => {
+            console.log(`Power down data received ${data}`);
+            setPowerDownActive(true);
+            executePowerDown(data.id);
+        });
+    }, [socket]);
+    const handlePowerUpClick = async (id: number) => {
+        socket?.emit("power-up-activate", id);
+    };
+
     useEffect(() => {
         const difficulty = data.matchData?.question?.difficulty;
-        if (!difficulty) return;
+        if (!difficulty || sessionStorage.getItem("timeLeft")) return;
 
         let timerValue = 0;
+        console.log("Difficulty", difficulty);
         switch (difficulty) {
             case "Easy":
-                timerValue = 30 * 60; // Convert to seconds directly
+                timerValue = 30 * 60;
                 break;
             case "Medium":
                 timerValue = 60 * 60;
@@ -46,26 +139,22 @@ export const CodingEnvironment = () => {
                 return;
         }
 
-        // Only set new timer if there's no existing timer
-        if (!localStorage.getItem('timeLeft')) {
-            setTimeLeft(timerValue);
-            localStorage.setItem('timeLeft', timerValue.toString());
-        }
+        setTimeLeft(timerValue);
+        sessionStorage.setItem("timeLeft", timerValue.toString());
     }, [data.matchData?.question?.difficulty]);
 
-    // Timer countdown effect
     useEffect(() => {
         if (timeLeft <= 0) return;
 
         const timerInterval = setInterval(() => {
-            setTimeLeft(prevTime => {
+            setTimeLeft((prevTime) => {
                 const newTime = prevTime - 1;
                 if (newTime <= 0) {
                     clearInterval(timerInterval);
-                    localStorage.removeItem('timeLeft');
+                    sessionStorage.removeItem("timeLeft");
                     return 0;
                 }
-                localStorage.setItem('timeLeft', newTime.toString());
+                sessionStorage.setItem("timeLeft", newTime.toString());
                 return newTime;
             });
         }, 1000);
@@ -73,40 +162,51 @@ export const CodingEnvironment = () => {
         return () => clearInterval(timerInterval);
     }, [timeLeft]);
 
-    const formatTime = useCallback(() => {
+    useEffect(() => {
+        const newDefaultCode = DefaultValues(
+            language,
+            data?.matchData?.question?.description,
+        );
+        setDefaultCode(newDefaultCode);
+        setCode(newDefaultCode); // Optionally reset the editor's code
+    }, [language, data?.matchData?.question?.description]);
+
+    const formatTime = useMemo(() => {
         const minutes = Math.floor(timeLeft / 60);
         const seconds = timeLeft % 60;
-        return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        return `${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")
+            }`;
     }, [timeLeft]);
 
     const executeCode = async () => {
         setIsExecuting(true);
         setOutput("Executing...");
 
-        const selectedLang = Languages.find(lang => lang.value === language);
-
+        const selectedLang = Languages.find((lang) => lang.value === language);
+        console.log("Executing", code);
         try {
             const response = await fetch(PISTON_CODE_EXECUTOR, {
-                method: 'POST',
+                method: "POST",
                 headers: {
-                    'Content-Type': 'application/json',
+                    "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
                     language: language,
                     version: selectedLang?.version,
                     files: [{
-                        content: code
-                    }]
-                })
+                        content: code,
+                    }],
+                }),
             });
 
-            const data = await response.json();
-            setOutput(data.run?.output || data.message || 'No output');
-            toast({
-                title: "Success",
-                description: data.run?.output || data.message,
-                duration: 5000
-            })
+            const data: CodeExecutionResult = await response.json();
+            console.log("Output data", data);
+            if (data.run.code === 1) {
+                setCodeError(true);
+            } else if (data.run.code === 0) {
+                setCodeError(false);
+            }
+            setOutput(data.run?.output || data.message || "No output");
         } catch (error) {
             setOutput(`Error: ${error}`);
         } finally {
@@ -117,20 +217,30 @@ export const CodingEnvironment = () => {
     return (
         <div className="min-h-screen bg-gray-950 p-8">
             <Toaster />
-            <div className="max-w-[90%] mx-auto">
-                <div className="w-3/4">
+            <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+                className="max-w-[90%] mx-auto"
+            >
+                <div className="w-full md:w-3/4 mx-auto">
                     <div className="bg-gray-900 rounded-xl overflow-hidden shadow-2xl border border-gray-800">
-                        <div className="flex items-center p-4 bg-gray-900 border-b border-gray-800">
-                            <Select value={language} onValueChange={setLanguage}>
+                        <div className="flex flex-wrap items-center p-4 bg-gray-900 border-b border-gray-800">
+                            <Select
+                                value={language}
+                                onValueChange={setLanguage}
+                            >
                                 <SelectTrigger className="w-32 bg-gray-800 border-gray-700 text-gray-100">
-                                    <SelectValue placeholder="Language"/>
+                                    <SelectValue placeholder="Language" />
                                 </SelectTrigger>
                                 <SelectContent className="bg-gray-800 border-gray-700 text-gray-100">
-                                    {Languages.map(lang => (
+                                    {Languages.map((lang) => (
                                         <SelectItem
                                             key={lang.value}
                                             value={lang.value}
                                             className="text-gray-100 hover:bg-gray-700 focus:bg-gray-700 focus:text-gray-100"
+                                            onClick={() =>
+                                                setLanguage(lang.label)}
                                         >
                                             {lang.label}
                                         </SelectItem>
@@ -138,82 +248,203 @@ export const CodingEnvironment = () => {
                                 </SelectContent>
                             </Select>
                             <div className="flex items-center space-x-2 ml-auto text-gray-100">
-                                {/* Clock Icon and Timer */}
-                                <FaClock className="w-6 h-46animate-pulse"/>
-                                <p className="font-mono">{formatTime()}</p>
+                                <FaClock className="w-4 h-4 animate-pulse" />
+                                <p className="font-mono">{formatTime}</p>
                             </div>
-                            {/* Buttons Group */}
-                            <div className="flex space-x-2 ml-auto">
-                                <Button variant="outline"
-                                        className="bg-gray-800 border-gray-700 hover:bg-gray-700 hover:border-gray-600 text-gray-100"
-                                        onClick={() => setEditorTheme(() => {
-                                            if (editorTheme === "vs-dark") return "light";
-                                            else return "vs-dark";
-                                        })}>
-                                    {editorTheme === "vs-dark" ? <Sun className="h-4 w-4"/> : <Moon />}
+                            <div className="flex space-x-2 ml-auto mt-2 sm:mt-0">
+                                <div className="max-w-2xl mx-auto">
+                                    <TooltipProvider>
+                                        <div className="flex justify-center space-x-3">
+                                            {powerups.map((powerup, index) => (
+                                                <Tooltip key={index}>
+                                                    <TooltipTrigger>
+                                                        <motion.div
+                                                            className="relative cursor-pointer"
+                                                            onHoverStart={() =>
+                                                                setHoveredIndex(
+                                                                    index,
+                                                                )}
+                                                            onHoverEnd={() =>
+                                                                setHoveredIndex(
+                                                                    null,
+                                                                )}
+                                                            onClick={() =>
+                                                                handlePowerUpClick(
+                                                                    powerup.id,
+                                                                )} // Trigger API call
+                                                        >
+                                                            <motion.div
+                                                                className={cn(
+                                                                    "w-12 h-9 rounded-md flex items-center justify-center",
+                                                                    "bg-gray-700/50 hover:bg-gray-600/50 border border-gray-600",
+                                                                    powerup
+                                                                        .color,
+                                                                )}
+                                                                whileHover={{
+                                                                    scale: 1.05,
+                                                                }}
+                                                                transition={{
+                                                                    type:
+                                                                        "spring",
+                                                                    stiffness:
+                                                                        400,
+                                                                    damping: 10,
+                                                                }}
+                                                            >
+                                                                {powerup.icon}
+                                                            </motion.div>
+                                                            {hoveredIndex ===
+                                                                index && (
+                                                                    <motion.div
+                                                                        className="absolute -top-1 -right-1 w-3 h-3 bg-blue-500 rounded-full"
+                                                                        initial={{
+                                                                            scale:
+                                                                                0,
+                                                                        }}
+                                                                        animate={{
+                                                                            scale:
+                                                                                1,
+                                                                        }}
+                                                                        transition={{
+                                                                            duration:
+                                                                                0.2,
+                                                                        }}
+                                                                    />
+                                                                )}
+                                                        </motion.div>
+                                                    </TooltipTrigger>
+                                                    <TooltipContent
+                                                        side="bottom"
+                                                        className="bg-gray-800/90 text-white border border-gray-700 p-2 rounded-md"
+                                                    >
+                                                        <p>{powerup.label}</p>
+                                                    </TooltipContent>
+                                                </Tooltip>
+                                            ))}
+                                        </div>
+                                    </TooltipProvider>
+                                </div>
+                                <Button
+                                    variant="outline"
+                                    className="bg-gray-800 border-gray-700 hover:bg-gray-700 hover:border-gray-600 text-gray-100"
+                                    onClick={() =>
+                                        setEditorTheme(
+                                            (theme) => (theme === "vs-dark"
+                                                ? "light"
+                                                : "vs-dark")
+                                        )}
+                                >
+                                    {editorTheme === "vs-dark"
+                                        ? <Sun className="h-4 w-4" />
+                                        : <Moon className="h-4 w-4" />}
+                                    <span className="sr-only">
+                                        Toggle theme
+                                    </span>
                                 </Button>
                                 <Button
                                     variant="outline"
                                     onClick={executeCode}
-                                    disabled={isExecuting}
+                                    disabled={isExecuting ||
+                                        disableCodeCompilation &&
+                                        powerDownActive}
                                     className="bg-gray-800 border-gray-700 hover:bg-gray-700 hover:border-gray-600 text-gray-100"
                                 >
-                                    {isExecuting ? (
-                                        <>
-                                            <Loader2 className="w-4 h-4 mr-2 animate-spin"/>
-                                            Running
-                                        </>
-                                    ) : (
-                                        'Run'
-                                    )}
+                                    {isExecuting
+                                        ? (
+                                            <>
+                                                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                                                Running
+                                            </>
+                                        )
+                                        : (
+                                            "Run"
+                                        )}
                                 </Button>
                                 <Button
                                     className="bg-gray-800 border-gray-700 hover:bg-gray-700 hover:border-gray-600 text-gray-100"
-                                    onClick={() => {
-                                        setCode("");
-                                    }}
+                                    onClick={() => setCode("")}
                                 >
                                     Clear
                                 </Button>
                             </div>
                         </div>
-                        {/* Editor Container */}
                         <div className="h-[60vh]">
                             <Editor
                                 height="100%"
-                                theme="vs-dark"
+                                theme={editorTheme}
                                 language={language}
                                 value={code}
-                                defaultValue={`/*\n${data.matchData.question.description}\n*/`}
+                                defaultValue={defaultCode}
                                 onChange={(value) => setCode(value || "")}
                                 options={{
                                     fontSize: 16,
                                     fontFamily: "'Fira Code', monospace",
-                                    padding: {top: 20, bottom: 20},
-                                    minimap: {enabled: false},
-                                    theme: editorTheme,
+                                    padding: { top: 20, bottom: 20 },
+                                    minimap: { enabled: false },
                                     scrollbar: {
                                         vertical: "hidden",
                                         horizontal: "visible",
                                     },
                                     wordWrap: "on",
                                     tabSize: 2,
+                                    autoIndent: "full",
                                 }}
                                 className="w-full"
                             />
                         </div>
-
-                        {/* Output Section */}
-                        <div
-                            className="border-t border-gray-800 pt-4 pl-2 pb-16 bg-gray-900 rounded-lg max-h-[20vh] overflow-auto">
-                            <pre
-                                className="text-gray-100 font-mono text-sm whitespace-pre-wrap overflow-auto text-left m-0">
-                                {`->\t`}{output || 'Run your code to see the output here...'}
-                            </pre>
-                        </div>
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ duration: 0.5 }}
+                            className="border-t border-gray-800 bg-gray-900 rounded-b-xl"
+                        >
+                            <div className="flex items-center p-2 bg-gray-800">
+                                <Terminal className="w-4 h-4 text-gray-400 mr-2" />
+                                <span className="text-sm text-gray-400">
+                                    Output
+                                </span>
+                            </div>
+                            <AnimatePresence mode="wait">
+                                <motion.div
+                                    key={output}
+                                    initial={{ opacity: 0, y: 20 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, y: -20 }}
+                                    transition={{ duration: 0.3 }}
+                                    className="p-4 max-h-[20vh] overflow-auto"
+                                >
+                                    <pre
+                                        className={`${codeError
+                                                ? "text-red-500"
+                                                : "text-green-500"
+                                            } font-mono text-sm whitespace-pre-wrap overflow-auto text-left m-0`}
+                                        style={{
+                                            fontFamily:
+                                                "JetBrains Mono Variable",
+                                        }}
+                                    >
+                                        {output ? (
+                                            output.split('\n').map((line, index) => (
+                                                <motion.span
+                                                    key={index}
+                                                    initial={{ opacity: 0, x: -20 }}
+                                                    animate={{ opacity: 1, x: 0 }}
+                                                    transition={{ duration: 0.3, delay: index * 0.1 }}
+                                                    className="block"
+                                                >
+                                                    {index === 0 ? '-> ' : '   '}{line}
+                                                </motion.span>
+                                            ))
+                                        ) : (
+                                            <span className="text-gray-500">Run your code to see the output here...</span>
+                                        )}
+                                    </pre>
+                                </motion.div>
+                            </AnimatePresence>
+                        </motion.div>
                     </div>
                 </div>
-            </div>
+            </motion.div>
         </div>
     );
 };

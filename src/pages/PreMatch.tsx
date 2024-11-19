@@ -22,6 +22,7 @@ import {motion} from "framer-motion";
 import {useToast} from "@/hooks/use-toast.ts";
 import {io} from "socket.io-client";
 import {WEBSOCKET_API_URL} from "@/api.ts";
+import useStore from "../websocketStore.ts";
 
 const steps = [
     {id: "username", title: "Username"},
@@ -192,7 +193,7 @@ export default function MatchSetupStepper() {
                 reconnection: true,
                 reconnectionDelay: 1000,
             });
-
+            useStore.getState().setWebSocket(socket)
             const gameDataToSocket = {
                 language: selectedLanguage,
                 category: selectedCategory,
