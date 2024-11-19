@@ -10,7 +10,7 @@ export const FeatureCard: React.FC<FeatureCardProps> = ({
   features,
   rankings,
 }) => (
-  <div className="bg-gray-800/50 backdrop-blur-sm p-6 rounded-xl hover:bg-gray-700/50 transition-all transform hover:-translate-y-1 hover:scale-105 border border-gray-700 group h-full">
+  <div className="bg-gray-800/50 backdrop-blur-sm p-6 rounded-xl hover:bg-gray-700/50 transition-all transform cursor-pointer hover:-translate-y-1 hover:scale-105 border border-gray-700 group h-full">
     <div className="flex items-center mb-4 space-x-3">
       <div className="p-2 bg-blue-500/10 rounded-lg group-hover:bg-blue-500/20 transition-colors">
         {icon}

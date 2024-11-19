@@ -93,6 +93,7 @@ import '@fontsource-variable/jetbrains-mono';
 // @ts-ignore
 import '@fontsource-variable/inter';
 import { useNavigate } from "react-router-dom";
+import AnimatedCodeEditor from "@/components/AnmatedCodeEditor.tsx";
 
 export const LandingPage = () => {
   const navigate = useNavigate();
@@ -103,7 +104,7 @@ export const LandingPage = () => {
   return (
       <div className="min-h-screen bg-gradient-to-b from-gray-900 to-black text-white" style={{ fontFamily: "Inter Variable" }}>
         {/* Hero Section */}
-        <div className="container mx-auto px-6 py-32">
+        <div className="container mx-auto px-6 pt-32 pb-16">
           <div className="text-center max-w-4xl mx-auto">
             <motion.h1
                 className="text-6xl font-bold mb-6 bg-gradient-to-r from-blue-400 to-purple-500 text-transparent bg-clip-text"
@@ -146,6 +147,8 @@ export const LandingPage = () => {
             </div>
           </div>
         </div>
+
+        <AnimatedCodeEditor />
 
         {/* Features Grid Section */}
         <div className="container mx-auto px-6 py-20">
