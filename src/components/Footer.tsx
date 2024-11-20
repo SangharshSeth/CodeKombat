@@ -10,7 +10,7 @@ export const Footer = () => {
                 <div className="space-y-4">
                     <div className="flex items-center space-x-2">
                         <Code className="w-6 h-6 text-blue-500"/>
-                        <span className="text-lg font-bold">Cod3Kombat</span>
+                        <span className="text-lg font-bold">C0deKombat</span>
                     </div>
                     <p className="text-gray-400 text-sm">
                         Challenge yourself and others in real-time coding battles.
