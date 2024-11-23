@@ -5,11 +5,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
   FaCode,
-  FaServer,
   FaSitemap,
 } from "react-icons/fa";
 import { cn } from "@/lib/utils";
-import { Database } from "lucide-react";
 import MatchFoundScreen from "@/components/MatchFound.tsx";
 import { useToast } from "@/hooks/use-toast.ts";
 import { io } from "socket.io-client";
