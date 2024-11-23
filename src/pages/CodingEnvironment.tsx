@@ -1,5 +1,5 @@
 import { Editor, useMonaco } from "@monaco-editor/react";
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -32,7 +32,6 @@ import { AnimatePresence, motion } from "framer-motion";
 // @ts-expect-error: Some-Error-Idonttknow
 import "@fontsource-variable/jetbrains-mono";
 import { cn } from "@/lib/utils.ts";
-import { Socket } from "socket.io-client";
 import useStore from "@/websocketStore.ts";
 import { DefaultValues } from "@/comments.ts";
 import { Input } from "@/components/ui/input";
@@ -46,10 +45,6 @@ interface CodeExecutionResult {
     output?: string;
   };
   message?: string;
-}
-
-export interface PowerUpsProps {
-  webSocket: Socket;
 }
 
 export interface Message {
@@ -74,7 +69,6 @@ export const CodingEnvironment = () => {
   const location = useLocation();
   const data: IMatchData = location.state.matchData || {};
   const [codeError, setCodeError] = useState(false);
-  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   const socket = useStore((state) => state.webSocket);
 
   const [chatMessagesContainer, setChatMessagesContainer] = useState<Message[]>(
