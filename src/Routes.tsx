@@ -3,8 +3,9 @@ import {LandingPage} from "./pages/Landing";
 import {CodingEnvironment} from "@/pages/CodingEnvironment.tsx";
 import {RootLayout} from "@/RootLayout.tsx";
 import {TermsAndConditions} from "@/pages/T&C.tsx";
-import {DashBoardLayout} from "@/DashBoardLayout.tsx";
+import { DashBoardLayout } from "@/DashBoardLayout.tsx";
 import PreMatch from "@/pages/PreMatch.tsx";
+import { Results } from "./pages/Results";
 
 export const router = createBrowserRouter([
     {
@@ -32,7 +33,11 @@ export const router = createBrowserRouter([
             {
                 path: "start-match",
                 element: <CodingEnvironment />
-            }
+            },
+            {
+                path: "results",
+                element: <Results />
+            },
         ]
     },
 

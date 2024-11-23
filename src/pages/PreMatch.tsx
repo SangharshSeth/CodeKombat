@@ -16,6 +16,7 @@ import { io } from "socket.io-client";
 import { WEBSOCKET_API_URL } from "@/api.ts";
 import useStore from "../websocketStore.ts";
 import {IsSearching} from "@/components/IsSearching.tsx";
+import { CircleDot, Swords, Wand2 } from "lucide-react"
 
 const categories = [
   {
@@ -34,43 +35,62 @@ const categories = [
     borderColor: "border-pink-400/50",
     hoverBg: "hover:bg-pink-400/20",
   },
-  {
-    name: "System Design",
-    icon: <FaServer className="text-3xl" />,
-    color: "text-indigo-400",
-    bgGradient: "from-indigo-400/20 to-indigo-400/10",
-    borderColor: "border-indigo-400/50",
-    hoverBg: "hover:bg-indigo-400/20",
-  },
-  {
-    name: "Database",
-    icon: <Database className="text-3xl" />,
-    color: "text-amber-400",
-    bgGradient: "from-amber-400/20 to-amber-400/10",
-    borderColor: "border-amber-400/50",
-    hoverBg: "hover:bg-amber-400/20",
-  },
 ];
 
 const difficulties = [
-  { name: "Easy", color: "bg-green-500 text-white" },
-  { name: "Medium", color: "bg-orange-500 text-white" },
-  { name: "Hard", color: "bg-red-500 text-white" },
+  { 
+    name: "Easy", 
+    color: "text-green-500",
+    ringColor: "focus-visible:ring-green-500",
+    bgColor: "bg-green-500",
+  },
+  { 
+    name: "Medium", 
+    color: "text-orange-500",
+    ringColor: "focus-visible:ring-orange-500",
+    bgColor: "bg-orange-500",
+  },
+  { 
+    name: "Hard", 
+    color: "text-red-500",
+    ringColor: "focus-visible:ring-red-500",
+    bgColor: "bg-red-500",
+  },
 ];
+
+const usernameWords = {
+  adjectives: ['Epic', 'Mystic', 'Cosmic', 'Shadow', 'Crystal', 'Thunder', 'Neon', 'Pixel', 'Cyber', 'Nova'],
+  nouns: ['Coder', 'Ninja', 'Phoenix', 'Dragon', 'Knight', 'Wizard', 'Hunter', 'Sage', 'Ghost', 'Wolf']
+}
+
+const generateUsername = () => {
+  const adjective = usernameWords.adjectives[Math.floor(Math.random() * usernameWords.adjectives.length)]
+  const noun = usernameWords.nouns[Math.floor(Math.random() * usernameWords.nouns.length)]
+  const number = Math.floor(Math.random() * 999)
+  return `${adjective}${noun}${number}`
+}
 
 export interface IMatchDataFromServer {
   player1: string;
   player2: string;
-  question: object;
+  question: {
+    description: string;
+    difficulty: string;
+  };
   roomId: string;
 }
 
 export interface IMatchData {
   opponentName: string;
+  userName: string;
   difficulty: string;
   category: string;
-  question: object;
+  question: {
+    description: string;
+    difficulty: string
+  };
   players: string[];
+  roomId: string;
 }
 
 export default function MatchSetupStepper() {
@@ -110,11 +130,14 @@ export default function MatchSetupStepper() {
         const opponent =
           data.player1 === username ? data.player2 : data.player1;
         console.log("DATA FROM SERVER", data);
+        console.log("Current Username", username)
         setMatchData({
           opponentName: opponent,
+          userName: username,
           difficulty: selectedDifficulty,
           category: selectedCategory,
           question: data.question,
+          roomId: data.roomId,
           players: [data.player1, data.player2],
         });
         toast({
@@ -156,13 +179,34 @@ export default function MatchSetupStepper() {
                 <Label htmlFor="username" className="text-white">
                   Username
                 </Label>
-                <Input
-                  id="username"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  placeholder="Enter your username"
-                  className="bg-gray-900 text-white border-gray-700 focus:border-blue-500"
-                />
+                <div className="relative">
+                  <Input
+                    placeholder="Enter username"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    className={cn(
+                      "pr-10",
+                      "text-gray-100 placeholder:text-gray-500",
+                      "bg-gray-900/50",
+                      "border-gray-700",
+                      "focus:border-blue-500 focus:ring-blue-500/20"
+                    )}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setUsername(generateUsername())}
+                    className={cn(
+                      "absolute right-2 top-1/2 -translate-y-1/2",
+                      "p-1.5 rounded-md",
+                      "text-gray-400 hover:text-blue-500",
+                      "bg-transparent hover:bg-blue-500/10",
+                      "transition-all duration-300"
+                    )}
+                    title="Generate username"
+                  >
+                    <Wand2 className="w-4 h-4" />
+                  </button>
+                </div>
               </div>
 
               <div className="space-y-4">
@@ -230,21 +274,53 @@ export default function MatchSetupStepper() {
 
               <div className="space-y-4">
                 <Label className="text-white">Difficulty Level</Label>
-                <div className="grid grid-cols-3 gap-2">
-                  {difficulties.map(({ name, color }) => (
-                    <Button
-                      key={name}
-                      variant={
-                        selectedDifficulty === name ? "default" : "outline"
-                      }
-                      className={cn(
-                        "bg-gray-700/50 hover:bg-gray-600/50 border border-gray-600",
-                        selectedDifficulty === name && color
-                      )}
-                      onClick={() => setSelectedDifficulty(name)}
-                    >
-                      {name}
-                    </Button>
+                <div className="flex flex-col space-y-3">
+                  {difficulties.map(({ name, color, ringColor }) => (
+                    <div key={name} className="relative">
+                      <input
+                        type="radio"
+                        name="difficulty"
+                        id={name}
+                        value={name}
+                        checked={selectedDifficulty === name}
+                        onChange={() => setSelectedDifficulty(name)}
+                        className="peer sr-only"
+                      />
+                      <label
+                        htmlFor={name}
+                        className={cn(
+                          "flex items-center gap-4",
+                          "p-2 cursor-pointer transition-all duration-300",
+                          "hover:bg-gray-800/50 rounded-md",
+                          "peer-focus-visible:ring-2 peer-focus-visible:ring-offset-2 peer-focus-visible:ring-offset-black",
+                          ringColor
+                        )}
+                      >
+                        <div className="relative flex items-center justify-center w-5 h-5">
+                          <div className={cn(
+                            "h-5 w-5 rounded-full border-2 border-gray-600",
+                            selectedDifficulty === name && "border-gray-400",
+                            "flex items-center justify-center",
+                            "transition-all duration-300"
+                          )}>
+                            <CircleDot 
+                              className={cn(
+                                "w-4 h-4",
+                                color,
+                                selectedDifficulty === name ? "opacity-100 scale-100" : "opacity-0 scale-0",
+                                "transition-all duration-300"
+                              )}
+                            />
+                          </div>
+                        </div>
+                        <span className={cn(
+                          "font-medium",
+                          selectedDifficulty === name ? color : "text-gray-300"
+                        )}>
+                          {name}
+                        </span>
+                      </label>
+                    </div>
                   ))}
                 </div>
               </div>
@@ -252,11 +328,20 @@ export default function MatchSetupStepper() {
           </Card>
 
           <div className="flex justify-center">
-            <Button
+            <Button 
               onClick={handleSearch}
-              disabled={!selectedDifficulty || !selectedCategory || !username}
-              className="bg-slate-500 hover:bg-blue-700 text-white px-8 py-2"
+              disabled={!selectedCategory || !selectedDifficulty}
+              className={cn(
+                "w-full py-6 text-lg font-semibold",
+                "bg-gradient-to-r from-blue-500/90 to-indigo-600/90",
+                "hover:from-blue-500 hover:to-indigo-600",
+                "disabled:from-gray-600/50 disabled:to-gray-700/50",
+                "transition-all duration-300",
+                "flex items-center justify-center gap-2",
+                "shadow-lg shadow-blue-500/20"
+              )}
             >
+              <Swords className="w-5 h-5" />
               Find Match
             </Button>
           </div>

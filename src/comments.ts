@@ -3,7 +3,7 @@ export const DefaultValues = (language: string, data: string) => {
         case "javascript":
             return `/*\n${data}\n*/`
         case "python":
-            return `'''\n${data}\n'''`
+            return `# ${data}`
         case "java":
             return `/*\n${data}\n*/`
         case "c++":
