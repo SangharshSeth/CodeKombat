@@ -13,8 +13,8 @@ import { useToast } from "@/hooks/use-toast.ts";
 import { io } from "socket.io-client";
 import { WEBSOCKET_API_URL } from "@/api.ts";
 import useStore from "../store/websocketStore.ts";
-import {IsSearching} from "@/components/IsSearching.tsx";
 import { CircleDot, Swords, Wand2 } from "lucide-react"
+import { motion } from "framer-motion";
 
 const categories = [
   {
@@ -156,20 +156,18 @@ export default function MatchSetupStepper() {
     }
   };
 
-  const searchingData = {
-      selectedCategory: selectedCategory,
-      selectedDifficulty: selectedDifficulty,
-  }
+  const handleCancelMatch = () => {
+    setMatchFound(false);
+    setIsSearching(false);
+  };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-900 to-black text-white p-8">
+    <div className="min-h-screen bg-gradient-to-b from-gray-900 to-black text-white p-4">
       {matchFound ? (
         <MatchFoundScreen
           matchData={matchData}
-          onCancel={() => setMatchFound(false)}
+          onCancel={handleCancelMatch}
         />
-      ) : isSearching ? (
-          <IsSearching searchingProps={searchingData} onCancel={() => setIsSearching(false)}  />
       ) : (
         <div className="max-w-2xl mx-auto space-y-8">
           <div className="text-center">
@@ -179,10 +177,10 @@ export default function MatchSetupStepper() {
             </p>
           </div>
 
-          <Card className="bg-gray-800/50 backdrop-blur-sm border border-gray-700">
+          <Card className="bg-gray-800/50 backdrop-blur-sm border border-gray-700 shadow-lg">
             <CardContent className="p-6 space-y-8">
               <div className="space-y-4">
-                <Label htmlFor="username" className="text-white">
+                <Label htmlFor="username" className="text-white font-semibold">
                   Username
                 </Label>
                 <div className="relative">
@@ -194,8 +192,8 @@ export default function MatchSetupStepper() {
                       "pr-10",
                       "text-gray-100 placeholder:text-gray-500",
                       "bg-gray-900/50",
-                      "border-gray-700",
-                      "focus:border-blue-500 focus:ring-blue-500/20"
+                      "border-gray-700 focus:border-blue-500 focus:ring-blue-500/20 shadow-sm",
+                      "transition-shadow duration-300"
                     )}
                   />
                   <button
@@ -334,22 +332,28 @@ export default function MatchSetupStepper() {
           </Card>
 
           <div className="flex justify-center">
-            <Button 
+            <motion.button
               onClick={handleSearch}
               disabled={!selectedCategory || !selectedDifficulty}
               className={cn(
-                "w-full py-6 text-lg font-semibold",
+                "w-full py-4 text-lg rounded-sm font-semibold",
                 "bg-gradient-to-r from-blue-500/90 to-indigo-600/90",
-                "hover:from-blue-500 hover:to-indigo-600",
+                "hover:from-blue-600 hover:to-indigo-700",
                 "disabled:from-gray-600/50 disabled:to-gray-700/50",
                 "transition-all duration-300",
                 "flex items-center justify-center gap-2",
-                "shadow-lg shadow-blue-500/20"
+                "shadow-lg shadow-blue-500/20 hover:shadow-blue-500/30"
               )}
             >
-              <Swords className="w-5 h-5" />
-              Find Match
-            </Button>
+              {isSearching ? (
+                <div className="animate-spin w-5 h-5 border-4 border-t-transparent border-blue-500 rounded-full" />
+              ) : (
+                <>
+                  <Swords className="w-5 h-5" />
+                  Find Match
+                </>
+              )}
+            </motion.button>
           </div>
         </div>
       )}

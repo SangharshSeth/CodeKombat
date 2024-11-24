@@ -11,7 +11,7 @@ interface MatchFoundScreenProps {
 
 const MatchFoundScreen = ({ matchData, onCancel }: MatchFoundScreenProps) => {
   const navigate = useNavigate();
-  const [timer, setTimer] = useState(10);  // Start the timer at 10 seconds
+  const [timer, setTimer] = useState(30);  // Start the timer at 10 seconds
 
   useEffect(() => {
     if (timer === 0) {
@@ -41,9 +41,9 @@ const MatchFoundScreen = ({ matchData, onCancel }: MatchFoundScreenProps) => {
       exit={{ opacity: 0 }}
       className="text-center w-full"
     >
-      <div className="relative overflow-hidden px-4">
+      <div className="h-screen px-4">
         <motion.div
-          className="absolute inset-0"
+          className=""
           animate={{
             background: [
               "radial-gradient(circle, rgba(56,189,248,0.05) 0%, transparent 60%)",
@@ -194,7 +194,7 @@ const MatchFoundScreen = ({ matchData, onCancel }: MatchFoundScreenProps) => {
           onClick={onCancel}
           className="px-4 py-1.5 bg-gray-700/30 hover:bg-gray-600/30 rounded-lg transition-colors text-gray-300 text-sm"
         >
-          Cancel Match
+          Cancel
         </motion.button>
       </div>
     </motion.div>
