@@ -14,6 +14,8 @@ export const DefaultValues = (language: string, data: string) => {
             return `/**\n${data}\n*/`
         case "kotlin":
             return `/**\n${data}\n*/`
+        case "rust":
+            return `/*\n${data}\n*/`
         default:
             return data
     }

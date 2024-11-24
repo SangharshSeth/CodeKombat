@@ -12,7 +12,7 @@ import MatchFoundScreen from "@/components/MatchFound.tsx";
 import { useToast } from "@/hooks/use-toast.ts";
 import { io } from "socket.io-client";
 import { WEBSOCKET_API_URL } from "@/api.ts";
-import useStore from "../websocketStore.ts";
+import useStore from "../store/websocketStore.ts";
 import {IsSearching} from "@/components/IsSearching.tsx";
 import { CircleDot, Swords, Wand2 } from "lucide-react"
 
@@ -67,15 +67,26 @@ const generateUsername = () => {
   const number = Math.floor(Math.random() * 999)
   return `${adjective}${noun}${number}`
 }
-
+export interface Problem {
+  id: number;
+  title: string;
+  description: string;
+  difficulty: string;
+  category: 'math' | 'crypto' | 'basic-algebra';
+  testCases: TestCase[];
+  constraints: string[];
+}
 export interface IMatchDataFromServer {
   player1: string;
   player2: string;
-  question: {
-    description: string;
-    difficulty: string;
-  };
+  question: Problem;
   roomId: string;
+}
+
+interface TestCase {
+  input: string | number | number[] | string[];
+  output: string | number | number[] | string[];
+  explanation?: string;
 }
 
 export interface IMatchData {
@@ -83,10 +94,7 @@ export interface IMatchData {
   userName: string;
   difficulty: string;
   category: string;
-  question: {
-    description: string;
-    difficulty: string
-  };
+  question: Problem;
   players: string[];
   roomId: string;
 }

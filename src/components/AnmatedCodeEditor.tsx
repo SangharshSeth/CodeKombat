@@ -1,6 +1,6 @@
 import {useState, useEffect} from 'react'
 import {motion} from 'framer-motion'
-// @ts-ignore
+// @ts-expect-error: some-error
 import '@fontsource-variable/jetbrains-mono';
 
 const codeSnippet = `function challengeAccepted() {
