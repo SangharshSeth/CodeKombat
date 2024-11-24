@@ -1,8 +1,10 @@
 import {TopNavBar} from "@/components/TopNav.tsx";
 import {Outlet} from "react-router-dom";
+// @ts-expect-error: some error
+import '@fontsource-variable/inter';
 
 export const DashBoardLayout = () => {
-    return <>
+    return <div style={{fontFamily: "Inter Variable"}}>
         <TopNavBar />
         <Outlet />
         <footer className="bg-gray-900">
@@ -14,5 +16,5 @@ export const DashBoardLayout = () => {
                 </div>
             </div>
         </footer>
-    </>
+    </div>
 }

@@ -28,6 +28,8 @@ import { Languages } from "@/constants.ts";
 import { PISTON_CODE_EXECUTOR } from "@/api.ts";
 import { Toaster } from "@/components/ui/toaster.tsx";
 import { AnimatePresence, motion } from "framer-motion";
+// @ts-expect-error: some error
+import '@fontsource-variable/jetbrains-mono';
 // @ts-expect-error: Some-Error-I-dont-know
 import "@fontsource-variable/jetbrains-mono";
 import { cn } from "@/lib/utils.ts";
@@ -294,8 +296,8 @@ export const CodingEnvironment = () => {
           transition={{duration: 0.5}}
           className="max-w-[95%] mx-auto flex gap-4"
       >
-        <div className="w-[30%] h-[calc(100vh-6rem)] flex flex-col space-y-4">
-          <div className="bg-gray-900 rounded-xl border border-gray-800 p-4 h-1/2 flex flex-col overflow-y-auto">
+        <div className="w-[30%] h-[calc(100vh-6rem)] flex flex-col space-y-4 overflow-hidden">
+          <div className="bg-gray-900 rounded-xl border border-gray-800 p-4 h-2/3 flex flex-col overflow-y-auto">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-gray-100 font-semibold flex items-center">
                 <Swords className="w-4 h-4 mr-2 text-purple-400"/>
@@ -328,7 +330,7 @@ export const CodingEnvironment = () => {
                   </motion.div>
                   <span
                       className={cn(
-                          "font-mono text-sm",
+                          "text-sm",
                           timeLeft <= 300 ? "text-red-400" : "text-purple-400"
                       )}
                   >
@@ -383,7 +385,7 @@ export const CodingEnvironment = () => {
 
               {/* Problem Description */}
               <div className="bg-gray-800/30 rounded-lg p-4">
-                <p className="text-gray-300 text-sm leading-relaxed whitespace-pre-wrap font-mono">
+                <p className="text-gray-300 text-sm leading-relaxed whitespace-pre-wrap">
                   {data?.question?.description || "No problem description available."}
                 </p>
               </div>
@@ -394,23 +396,23 @@ export const CodingEnvironment = () => {
                 <div className="bg-gray-800/30 rounded-lg p-4">
                   <ul className="space-y-4">
                     {data?.question?.testCases.slice(0, 1).map((testCase, index) => (
-                        <li key={index} className="font-mono">
+                        <li key={index}>
                           <div className="space-y-2">
                             <div>
-                              <span className="text-gray-400 text-xs">Input: </span>
+                              <span className="text-gray-400 text-sm">Input: </span>
                               <code className="text-sm text-gray-200">
                                 {JSON.stringify(testCase.input)}
                               </code>
                             </div>
                             <div>
-                              <span className="text-gray-400 text-xs">Output: </span>
+                              <span className="text-gray-400 text-sm">Output: </span>
                               <code className="text-sm text-gray-200">
                                 {JSON.stringify(testCase.output)}
                               </code>
                             </div>
                             {testCase.explanation && (
-                                <div>
-                                  <span className="text-gray-400 text-xs">Explanation: </span>
+                                <div style={{fontFamily: "Inter Variable"}}>
+                                  <span className="text-gray-400 text-sm">Explanation: </span>
                                   <code className="text-sm text-gray-200">
                                     {testCase.explanation}
                                   </code>
@@ -427,15 +429,15 @@ export const CodingEnvironment = () => {
               <div>
                 <h4 className="text-gray-100 font-semibold mb-3 text-sm">Constraints:</h4>
                 <div className="bg-gray-800/30 rounded-lg p-4">
-              <pre className="text-sm text-gray-200 font-mono whitespace-pre-wrap">
+              <pre className="text-sm text-gray-200 whitespace-pre-wrap" style={{fontFamily: "Inter Variable"}}>
                 {data?.question?.constraints}
               </pre>
                 </div>
               </div>
             </div>
-          </div>
+          </div >
 
-          <div className="bg-gray-900 rounded-xl border border-gray-800 h-1/2 p-4">
+          <div className="bg-gray-900 rounded-xl border border-gray-800 h-1/3 p-4">
             <h3 className="text-gray-100 font-semibold mb-2 flex items-center">
               <MessageCircle className="w-4 h-4 mr-2"/>
               Battle Chat
@@ -669,7 +671,7 @@ export const CodingEnvironment = () => {
                   onChange={(value) => setCode(value || "")}
                   options={{
                     fontSize: 16,
-                    fontFamily: "'Fira Code', monospace",
+                    fontFamily: "Fira Code",
                     padding: {top: 20, bottom: 20},
                     minimap: {enabled: false},
                     scrollbar: {
@@ -707,6 +709,7 @@ export const CodingEnvironment = () => {
                           {output
                               .split("\n")
                               .filter((line) => line.trim() !== "")
+                              .slice(0, 4)
                               .map((line, index) => (
                                   <motion.div
                                       key={index}
@@ -739,7 +742,7 @@ export const CodingEnvironment = () => {
                                       </div>
                                       <pre
                                           className={cn(
-                                              "font-mono text-sm whitespace-pre-wrap overflow-auto text-left m-0 flex-1",
+                                              "text-sm whitespace-pre-wrap overflow-auto text-left m-0 flex-1",
                                               codeError
                                                   ? "text-red-400"
                                                   : "text-green-400"
