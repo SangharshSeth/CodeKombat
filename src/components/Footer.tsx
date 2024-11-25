@@ -1,7 +1,7 @@
 import {FaGithub, FaLinkedin, FaTwitter} from "react-icons/fa";
 import {MdEmail} from "react-icons/md";
 import {Link} from "react-router-dom";
-import {Code} from "lucide-react";
+
 
 export const Footer = () => {
     return <footer className="bg-black border-t border-gray-800 text-white">
@@ -9,8 +9,21 @@ export const Footer = () => {
             <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
                 <div className="space-y-4">
                     <div className="flex items-center space-x-2">
-                        <Code className="w-6 h-6 text-blue-500"/>
-                        <span className="text-lg font-bold">C0deKombat</span>
+                        <div className="relative group">
+                            <div className="text-xl font-bold relative z-10 overflow-hidden">
+                            <span className="relative inline-block px-4 py-2">
+                                <span className="font-mono text-gray-100">C</span>
+                                <span className="font-mono text-blue-400 tracking-wider">0</span>
+                                <span className="font-mono text-gray-100">de</span>
+                                <span
+                                    className="ml-1 font-sans bg-gradient-to-r from-blue-400 to-indigo-500 bg-clip-text text-transparent">
+                                    Kombat
+                                </span>
+
+                                <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-purple-500/10 rounded-lg -z-10"/>
+                            </span>
+                            </div>
+                        </div>
                     </div>
                     <p className="text-gray-400 text-sm">
                         Challenge yourself and others in real-time coding battles.
@@ -31,7 +44,7 @@ export const Footer = () => {
                             </a>
                         </li>
                         <li>
-                            <a href="#" className="hover:text-blue-400 transition-colors">
+                        <a href="#" className="hover:text-blue-400 transition-colors">
                                 Live Battles
                             </a>
                         </li>

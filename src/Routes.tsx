@@ -1,44 +1,76 @@
 import {createBrowserRouter} from "react-router-dom";
-import {LandingPage} from "./pages/Landing";
-import {CodingEnvironment} from "@/pages/CodingEnvironment.tsx";
 import {RootLayout} from "@/RootLayout.tsx";
-import {TermsAndConditions} from "@/pages/T&C.tsx";
-import { DashBoardLayout } from "@/DashBoardLayout.tsx";
-import PreMatch from "@/pages/PreMatch.tsx";
-import { Results } from "./pages/Results";
+import {DashBoardLayout} from "@/DashBoardLayout.tsx";
+import React, {lazy, Suspense} from "react";
+import {LoadingSpinner} from "@/components/LoadingSpinner.tsx";
+import {AlertCircle} from "lucide-react";
+import {ProtectedRoute} from './components/ProtectedRoute.tsx';
+
+const LandingPage = lazy(() => import("./pages/Landing"));
+const TermsAndConditions = lazy(() => import("./pages/T&C"));
+const PreMatch = lazy(() => import("./pages/PreMatch.tsx"));
+const CodingEnvironment = lazy(() => import("./pages/CodingEnvironment"));
+const Results = lazy(() => import("./pages/Results"));
+const ProfilePage = lazy(() => import("./pages/Profile.tsx"))
+
+const withSuspense = (Component: React.ComponentType) => (
+    <Suspense fallback={<LoadingSpinner/>}>
+        <Component/>
+    </Suspense>
+);
+
+const ErrorBoundary = () => (
+    <div
+        className="min-h-screen flex items-center justify-center bg-gradient-to-b from-gray-900 to-black text-white p-4">
+        <div className="max-w-md w-full space-y-8 text-center">
+            <AlertCircle className="mx-auto h-12 w-12 text-red-500"/>
+            <h1 className="text-2xl font-bold">Oops! Something went wrong</h1>
+            <p className="text-gray-300">
+                You Should not be at this route! Go home!
+            </p>
+        </div>
+    </div>
+)
 
 export const router = createBrowserRouter([
     {
         path: '/',
-        element: <RootLayout />,
+        element: <RootLayout/>,
+        errorElement: <ErrorBoundary/>,
         children: [
             {
                 index: true,
-                element: <LandingPage />
+                element: withSuspense(LandingPage)
             },
             {
                 path: "/terms-and-conditions",
-                element: <TermsAndConditions />
+                element: withSuspense(TermsAndConditions)
             }
         ]
     },
     {
         path: '/app',
-        element: <DashBoardLayout/>,
+        element: (
+            <DashBoardLayout/>
+
+        ),
         children: [
             {
                 index: true,
-                element: <PreMatch />
+                element: withSuspense(PreMatch)
             },
             {
                 path: "start-match",
-                element: <CodingEnvironment />
+                element: withSuspense(CodingEnvironment)
+            },
+            {
+                path: "profile",
+                element: withSuspense(ProfilePage)
             },
             {
                 path: "results",
-                element: <Results />
+                element: withSuspense(Results)
             },
         ]
     },
-
 ]);

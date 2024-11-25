@@ -8,8 +8,13 @@ import '@fontsource-variable/jetbrains-mono';
 import '@fontsource-variable/inter';
 import { useNavigate } from "react-router-dom";
 import AnimatedCodeEditor from "@/components/AnmatedCodeEditor.tsx";
+import { useAuthStore} from "@/store/AuthSupabase.ts";
+import React from "react";
 
-export const LandingPage = () => {
+
+
+ const LandingPage: React.FunctionComponent<object> = () => {
+     const { signInWithGithub } = useAuthStore();
   const navigate = useNavigate();
   const handleSubmit = (): void => {
     navigate("/app");
@@ -54,6 +59,7 @@ export const LandingPage = () => {
                   className="bg-gray-800 hover:bg-gray-700 px-8 py-4 rounded-lg text-lg font-semibold flex items-center space-x-2 transition-colors transform hover:scale-105"
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
+                  onClick={signInWithGithub}
               >
                 <FaGithub className="w-5 h-5" />
                 <span>Sign in with GitHub</span>
@@ -128,3 +134,5 @@ export const LandingPage = () => {
       </div>
   );
 };
+
+ export default LandingPage;

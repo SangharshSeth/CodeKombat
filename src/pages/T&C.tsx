@@ -1,5 +1,5 @@
 
-export const TermsAndConditions = () => {
+ const TermsAndConditions: React.FC<object> = () => {
     return (
         <div className="min-h-screen bg-gradient-to-b from-gray-900 to-black text-white">
             {/* Main Content */}
@@ -95,3 +95,5 @@ export const TermsAndConditions = () => {
         </div>
     );
 };
+
+export default TermsAndConditions;

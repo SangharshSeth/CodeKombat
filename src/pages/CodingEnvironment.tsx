@@ -1,5 +1,5 @@
 import { Editor, useMonaco } from "@monaco-editor/react";
-import { useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -58,7 +58,7 @@ export interface Message {
   roomId: string;
 }
 
-export const CodingEnvironment = () => {
+ const CodingEnvironment: React.FC<object> = () => {
   const [code, setCode] = useState("");
   const [language, setLanguage] = useState("python");
   const [output, setOutput] = useState("");
@@ -774,4 +774,4 @@ export const CodingEnvironment = () => {
     </div>
   );
 };
-
+export default CodingEnvironment;

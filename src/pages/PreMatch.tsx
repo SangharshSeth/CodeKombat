@@ -15,6 +15,7 @@ import { WEBSOCKET_API_URL } from "@/api.ts";
 import useStore from "../store/websocketStore.ts";
 import { CircleDot, Swords, Wand2 } from "lucide-react"
 import { motion } from "framer-motion";
+import {useAuthStore} from "@/store/AuthSupabase.ts";
 
 const categories = [
   {
@@ -37,7 +38,7 @@ const categories = [
 
 const difficulties = [
   { 
-    name: "Easy", 
+    name: "Easy",
     color: "text-green-500",
     ringColor: "focus-visible:ring-green-500",
     bgColor: "bg-green-500",
@@ -99,7 +100,7 @@ export interface IMatchData {
   roomId: string;
 }
 
-export default function MatchSetupStepper() {
+export default function PreMatch() {
 
   const [username, setUsername] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
@@ -108,6 +109,7 @@ export default function MatchSetupStepper() {
   const [matchFound, setMatchFound] = useState(false);
   const [matchData, setMatchData] = useState<IMatchData | undefined>();
   const { toast } = useToast();
+  const { session } = useAuthStore()
 
   const handleSearch = () => {
     if (selectedCategory && selectedDifficulty) {
@@ -181,64 +183,65 @@ export default function MatchSetupStepper() {
             <CardContent className="p-6 space-y-8">
               <div className="space-y-4">
                 <Label htmlFor="username" className="text-white font-semibold">
-                  Username
+                  Welcome {session?.user?.user_metadata.name}
                 </Label>
-                <div className="relative">
+                {!session && <div className="relative">
                   <Input
-                    placeholder="Enter username"
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
-                    className={cn(
-                      "pr-10",
-                      "text-gray-100 placeholder:text-gray-500",
-                      "bg-gray-900/50",
-                      "border-gray-700 focus:border-blue-500 focus:ring-blue-500/20 shadow-sm",
-                      "transition-shadow duration-300"
-                    )}
+                      placeholder="Enter username"
+                      value={username}
+                      onChange={(e) => setUsername(e.target.value)}
+                      className={cn(
+                          "pr-10",
+                          "text-gray-100 placeholder:text-gray-500",
+                          "bg-gray-900/50",
+                          "border-gray-700 focus:border-blue-500 focus:ring-blue-500/20 shadow-sm",
+                          "transition-shadow duration-300"
+                      )}
                   />
                   <button
-                    type="button"
-                    onClick={() => setUsername(generateUsername())}
-                    className={cn(
-                      "absolute right-2 top-1/2 -translate-y-1/2",
-                      "p-1.5 rounded-md",
-                      "text-gray-400 hover:text-blue-500",
-                      "bg-transparent hover:bg-blue-500/10",
-                      "transition-all duration-300"
-                    )}
-                    title="Generate username"
+                      type="button"
+                      onClick={() => setUsername(generateUsername())}
+                      className={cn(
+                          "absolute right-2 top-1/2 -translate-y-1/2",
+                          "p-1.5 rounded-md",
+                          "text-gray-400 hover:text-blue-500",
+                          "bg-transparent hover:bg-blue-500/10",
+                          "transition-all duration-300"
+                      )}
+                      title="Generate username"
                   >
-                    <Wand2 className="w-4 h-4" />
+                    <Wand2 className="w-4 h-4"/>
                   </button>
-                </div>
+                </div>}
+
               </div>
 
               <div className="space-y-4">
                 <Label className="text-white">Challenge Category</Label>
                 <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3">
                   {categories.map(
-                    ({
-                      name,
-                      icon,
-                      color,
-                      bgGradient,
-                      borderColor,
-                      hoverBg,
-                    }) => (
-                      <Button
-                        key={name}
-                        type="button"
-                        variant="outline"
-                        className={cn(
-                          "h-24 relative overflow-hidden transition-all duration-300 border",
-                          "bg-gray-800/50 hover:bg-gray-700/50 active:bg-gray-700/50",
-                          "text-white hover:text-white active:text-white",
-                          selectedCategory === name
-                            ? cn(
-                                "bg-gradient-to-br",
-                                bgGradient,
-                                borderColor,
-                                "border-2",
+                      ({
+                         name,
+                         icon,
+                         color,
+                         bgGradient,
+                         borderColor,
+                         hoverBg,
+                       }) => (
+                          <Button
+                              key={name}
+                              type="button"
+                              variant="outline"
+                              className={cn(
+                                  "h-24 relative overflow-hidden transition-all duration-300 border",
+                                  "bg-gray-800/50 hover:bg-gray-700/50 active:bg-gray-700/50",
+                                  "text-white hover:text-white active:text-white",
+                                  selectedCategory === name
+                                      ? cn(
+                                          "bg-gradient-to-br",
+                                          bgGradient,
+                                          borderColor,
+                                          "border-2",
                                 "hover:bg-gradient-to-br",
                                 color
                               )
@@ -337,12 +340,10 @@ export default function MatchSetupStepper() {
               disabled={!selectedCategory || !selectedDifficulty}
               className={cn(
                 "w-full py-4 text-lg rounded-sm font-semibold",
-                "bg-gradient-to-r from-blue-500/90 to-indigo-600/90",
-                "hover:from-blue-600 hover:to-indigo-700",
+                "bg-gradient-to-r from-blue-700 to-indigo-900",
                 "disabled:from-gray-600/50 disabled:to-gray-700/50",
                 "transition-all duration-300",
                 "flex items-center justify-center gap-2",
-                "shadow-lg shadow-blue-500/20 hover:shadow-blue-500/30"
               )}
             >
               {isSearching ? (

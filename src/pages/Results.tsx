@@ -1,7 +1,8 @@
 import { useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
+import React from "react";
 
-export const Results = () => {
+ const Results: React.FC<object> = () => {
     const location = useLocation();
     const submittedCode = location.state?.submittedCode || "";
 
@@ -27,4 +28,5 @@ export const Results = () => {
             </div>
         </motion.div>
     );
-}; 
+};
+ export default Results;
