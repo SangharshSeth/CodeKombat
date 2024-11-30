@@ -4,14 +4,12 @@ import {DashBoardLayout} from "@/DashBoardLayout.tsx";
 import React, {lazy, Suspense} from "react";
 import {LoadingSpinner} from "@/components/LoadingSpinner.tsx";
 import {AlertCircle} from "lucide-react";
-import {ProtectedRoute} from './components/ProtectedRoute.tsx';
 
 const LandingPage = lazy(() => import("./pages/Landing"));
 const TermsAndConditions = lazy(() => import("./pages/T&C"));
 const PreMatch = lazy(() => import("./pages/PreMatch.tsx"));
 const CodingEnvironment = lazy(() => import("./pages/CodingEnvironment"));
 const Results = lazy(() => import("./pages/Results"));
-const ProfilePage = lazy(() => import("./pages/Profile.tsx"))
 
 const withSuspense = (Component: React.ComponentType) => (
     <Suspense fallback={<LoadingSpinner/>}>
@@ -62,10 +60,6 @@ export const router = createBrowserRouter([
             {
                 path: "start-match",
                 element: withSuspense(CodingEnvironment)
-            },
-            {
-                path: "profile",
-                element: withSuspense(ProfilePage)
             },
             {
                 path: "results",

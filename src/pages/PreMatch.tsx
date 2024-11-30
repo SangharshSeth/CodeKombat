@@ -15,7 +15,6 @@ import { WEBSOCKET_API_URL } from "@/api.ts";
 import useStore from "../store/websocketStore.ts";
 import { CircleDot, Swords, Wand2 } from "lucide-react"
 import { motion } from "framer-motion";
-import {useAuthStore} from "@/store/AuthSupabase.ts";
 
 const categories = [
   {
@@ -109,7 +108,6 @@ export default function PreMatch() {
   const [matchFound, setMatchFound] = useState(false);
   const [matchData, setMatchData] = useState<IMatchData | undefined>();
   const { toast } = useToast();
-  const { session } = useAuthStore()
 
   const handleSearch = () => {
     if (selectedCategory && selectedDifficulty) {
@@ -183,9 +181,9 @@ export default function PreMatch() {
             <CardContent className="p-6 space-y-8">
               <div className="space-y-4">
                 <Label htmlFor="username" className="text-white font-semibold">
-                  Welcome {session?.user?.user_metadata.name}
+                  Welcome
                 </Label>
-                {!session && <div className="relative">
+                <div className="relative">
                   <Input
                       placeholder="Enter username"
                       value={username}
@@ -212,7 +210,7 @@ export default function PreMatch() {
                   >
                     <Wand2 className="w-4 h-4"/>
                   </button>
-                </div>}
+                </div>
 
               </div>
 

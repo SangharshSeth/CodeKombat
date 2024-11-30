@@ -30,8 +30,6 @@ import { Toaster } from "@/components/ui/toaster.tsx";
 import { AnimatePresence, motion } from "framer-motion";
 // @ts-expect-error: some error
 import '@fontsource-variable/jetbrains-mono';
-// @ts-expect-error: Some-Error-I-dont-know
-import "@fontsource-variable/jetbrains-mono";
 import { cn } from "@/lib/utils.ts";
 import useStore from "@/store/websocketStore.ts";
 import { DefaultValues } from "@/comments.ts";
