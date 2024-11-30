@@ -13,6 +13,9 @@ export default {
   			sm: 'calc(var(--radius) - 4px)'
   		},
   		colors: {},
+        fontFamily: {
+              Inter: ["Inter Variable", "sans-serif"],
+        }
   	}
   },
   plugins: [require("tailwindcss-animate")],
