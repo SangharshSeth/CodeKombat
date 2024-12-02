@@ -196,6 +196,7 @@ export interface Message {
               content: code,
             },
           ],
+          run_timeout: 3000
         }),
       });
 
@@ -206,7 +207,8 @@ export interface Message {
       } else if (data.run.code === 0) {
         setCodeError(false);
       }
-      setOutput(data.run?.output || data.message || "No output");
+      setOutput(`${data.run?.output ?? data.message ?? "No output"}\n}`);
+    
     } catch (error) {
       setOutput(`Error: ${error}`);
     } finally {
@@ -228,6 +230,9 @@ export interface Message {
     console.log(data);
     socket?.emit("chat-message", messageObject);
     setNewChatMessage("");
+  };
+  const handleSubmit = () => {
+    socket?.emit("submit-code", code);
   };
 
 
@@ -648,6 +653,7 @@ export interface Message {
                         "border border-blue-500",
                         "shadow-sm shadow-blue-500/20"
                     )}
+                    onClick={handleSubmit}
                 >
                   <Send className="w-4 h-4 mr-2 text-blue-100"/>
                   Submit
